@@ -18,8 +18,8 @@ class Agent:
         self.context = None
         self.trajectory: List[Dict[str, str]] = []
         self.step_counter = 0
-        self.setup_logging()
         self.setup_directories()
+        self.setup_logging()        
 
     def setup_logging(self):
         self.logger = logging.getLogger('Agent')
@@ -30,13 +30,15 @@ class Agent:
         ch.setFormatter(formatter)
         self.logger.addHandler(ch)
         
-        fh = logging.FileHandler('agent.log')
+        log_file_path = os.path.join(self.log_dir, 'agent.log')
+        fh = logging.FileHandler(log_file_path)
         fh.setFormatter(formatter)
         self.logger.addHandler(fh)
 
     def setup_directories(self):
         self.log_dir = f"logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         self.screenshot_dir = os.path.join(self.log_dir, "screenshots")
+        os.makedirs(self.log_dir, exist_ok=True) 
         os.makedirs(self.screenshot_dir, exist_ok=True)
 
     async def setup(self):
@@ -71,10 +73,10 @@ class Agent:
         self.logger.info(f"Step {self.step_counter}: {action}")
         self.logger.info(f"Observation: {observation}")
 
-    async def search_google(self, query: str):
+    async def search_web(self, query: str, url="https://www.google.com"):
         try:
             self.logger.info(f"Navigating to Google...")
-            await self.page.goto("https://www.google.com", wait_until="networkidle", timeout=10000)
+            await self.page.goto(url, wait_until="networkidle", timeout=10000)
             await self.log_action("Navigated to Google", "Google homepage loaded")
             
             self.logger.info(f"Searching for: {query}")
@@ -103,7 +105,7 @@ class Agent:
         try:
             if self.llm_type.startswith("gpt"):
                 response = await asyncio.wait_for(
-                    asyncio.to_thread(gpt, prompt, model=self.llm_type, temperature=self.temperature, max_tokens=100),
+                    asyncio.to_thread(gpt4, prompt, model=self.llm_type, temperature=self.temperature, max_tokens=1000),
                     timeout=30  # 30 second timeout
                 )
             elif self.llm_type == "claude":
@@ -136,7 +138,7 @@ class Agent:
     async def run(self, initial_query: str, max_steps: int = 5):
         await self.setup()
         try:
-            await self.search_google(initial_query)
+            await self.search_web(initial_query)
             
             for step in range(max_steps):
                 self.logger.info(f"Starting step {step + 1} of {max_steps}")
@@ -159,7 +161,7 @@ class Agent:
                 
                 elif next_action.lower().startswith("search"):
                     query = next_action.split("search", 1)[1].strip()
-                    await self.search_google(query)
+                    await self.search_web(query)
                 
                 else:
                     await self.log_action(f"Unsupported action: {next_action}", "Skipping this step")
@@ -177,8 +179,9 @@ class Agent:
         return prompt
 
 async def main():
-    agent = Agent(llm_type="gpt-3.5-turbo-16k")
-    trajectory = await agent.run("What is the capital of France?")
+    agent = Agent(llm_type="gpt-4")
+    query = "What is the capital of France?"
+    trajectory = await agent.run(query)
     
     print("\nFinal Trajectory:")
     for step in trajectory:
