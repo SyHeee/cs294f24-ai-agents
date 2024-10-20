@@ -8,6 +8,9 @@ import anthropic
 import google.generativeai as genai
 from transformers import GPT2Tokenizer
 
+from utils import setup_logging, get_log_dir
+log_dir, _ = get_log_dir()
+logger = setup_logging(log_dir, 'LLM')
 
 
 # Load environment variables from .env file
@@ -20,17 +23,17 @@ tokenizer = GPT2Tokenizer.from_pretrained('gpt2-medium')
 # OpenAI setup
 openai.api_key = os.getenv("OPENAI_API_KEY")
 if not openai.api_key:
-    print("Warning: OPENAI_API_KEY is not set in .env file")
+    logger.info("Warning: OPENAI_API_KEY is not set in .env file")
 
 # Anthropic setup
 anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
 if not anthropic_api_key:
-    print("Warning: ANTHROPIC_API_KEY is not set in .env file")
+    logger.info("Warning: ANTHROPIC_API_KEY is not set in .env file")
 
 # Google AI setup
 google_api_key = os.getenv("GOOGLE_API_KEY")
 if not google_api_key:
-    print("Warning: GOOGLE_API_KEY is not set in .env file")
+    logger.info("Warning: GOOGLE_API_KEY is not set in .env file")
 else:
     genai.configure(api_key=google_api_key)
 
@@ -86,20 +89,26 @@ def gpt3(prompt, model="text-davinci-002", temperature=1.0, max_tokens=100, n=1,
     return outputs
 
 def gpt(prompt, model="gpt-3.5-turbo-16k", temperature=1.0, max_tokens=100, n=1, stop=None) -> list:
+    response = []
     if model == "text-davinci-002":
-        return gpt3(prompt, model, temperature, max_tokens, n, stop)
+        response = gpt3(prompt, model, temperature, max_tokens, n, stop)        
     else:
         messages = [{"role": "user", "content": prompt}]
-        return chatgpt(messages, model=model, temperature=temperature, max_tokens=max_tokens, n=n, stop=stop)
+        response = chatgpt(messages, model=model, temperature=temperature, max_tokens=max_tokens, n=n, stop=stop)
+    return response
 
-def gpt4(prompt, model="gpt-4", temperature=0.2, max_tokens=100, n=1, stop=None) -> list:
+def gpt4(prompt, model="gpt-4o", temperature=0.2, max_tokens=100, n=1, stop=None) -> list:
+    logger.debug(f"{model} prompt: {prompt} #END")
+    response = []
     if model == "text-davinci-002":
-        return gpt3(prompt, model, temperature, max_tokens, n, stop)
+        response =  gpt3(prompt, model, temperature, max_tokens, n, stop)
     else:
         messages = [{"role": "user", "content": prompt}]
-        return chatgpt(messages, model=model, temperature=temperature, max_tokens=max_tokens, n=n, stop=stop)
+        response =  chatgpt(messages, model=model, temperature=temperature, max_tokens=max_tokens, n=n, stop=stop)
+    logger.debug(f"gpt4 response: {response}")
+    return response
 
-def chatgpt(messages, model="gpt-3.5-turbo-16k", temperature=1.0, max_tokens=100, n=1, stop=None) -> list:
+def chatgpt(messages, model="gpt-4o", temperature=1.0, max_tokens=100, n=1, stop=None) -> list:
     global completion_tokens, prompt_tokens
     outputs = []
     while n > 0:

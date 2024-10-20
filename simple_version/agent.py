@@ -9,6 +9,9 @@ import logging
 from datetime import datetime
 import time
 
+from prompts import _initialize_prompt
+from utils import setup_logging, get_log_dir
+
 class Agent:
     def __init__(self, llm_type: str = "gpt-3.5-turbo-16k", temperature: float = 0.7):
         self.llm_type = llm_type
@@ -18,28 +21,9 @@ class Agent:
         self.context = None
         self.trajectory: List[Dict[str, str]] = []
         self.step_counter = 0
-        self.setup_directories()
-        self.setup_logging()        
-
-    def setup_logging(self):
-        self.logger = logging.getLogger('Agent')
-        self.logger.setLevel(logging.DEBUG)  # Changed to DEBUG for more detailed logs
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         
-        ch = logging.StreamHandler()
-        ch.setFormatter(formatter)
-        self.logger.addHandler(ch)
-        
-        log_file_path = os.path.join(self.log_dir, 'agent.log')
-        fh = logging.FileHandler(log_file_path)
-        fh.setFormatter(formatter)
-        self.logger.addHandler(fh)
-
-    def setup_directories(self):
-        self.log_dir = f"logs_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        self.screenshot_dir = os.path.join(self.log_dir, "screenshots")
-        os.makedirs(self.log_dir, exist_ok=True) 
-        os.makedirs(self.screenshot_dir, exist_ok=True)
+        self.log_dir, self.screenshot_dir = get_log_dir()
+        self.logger = setup_logging(self.log_dir, 'Agent')
 
     async def setup(self):
         self.logger.info("Setting up the browser...")
@@ -79,7 +63,8 @@ class Agent:
             await self.page.goto(url, wait_until="networkidle", timeout=10000)
             await self.log_action("Navigated to Google", "Google homepage loaded")
             
-            self.logger.info(f"Searching for: {query}")
+            self.logger.info(f"Searching for: {query}") 
+            # TODO: add the fill text and search in llm function calling 
             search_input = await self.page.wait_for_selector('input[name="q"]', state="visible", timeout=5000)
             await search_input.type(query, delay=50)  # Reduced delay
             await asyncio.sleep(0.5)  # Reduced sleep time
@@ -103,11 +88,12 @@ class Agent:
         self.logger.info("Getting LLM response...")
         start_time = time.time()
         try:
-            if self.llm_type.startswith("gpt"):
+            if self.llm_type == "gpt-4o":
+                import pdb; pdb.set_trace() 
                 response = await asyncio.wait_for(
-                    asyncio.to_thread(gpt4, prompt, model=self.llm_type, temperature=self.temperature, max_tokens=1000),
+                    asyncio.to_thread(gpt4, prompt, model=self.llm_type, temperature=self.temperature, max_tokens=15000),
                     timeout=30  # 30 second timeout
-                )
+                )            
             elif self.llm_type == "claude":
                 client = anthropic.Client(api_key=os.environ["ANTHROPIC_API_KEY"])
                 response = await asyncio.wait_for(
@@ -142,7 +128,10 @@ class Agent:
             
             for step in range(max_steps):
                 self.logger.info(f"Starting step {step + 1} of {max_steps}")
-                prompt = self.generate_prompt()
+                if step >= 0:
+                    prompt = self.generate_prompt()
+                # else:
+                #     prompt = _initialize_prompt()
                 next_action = await self.get_llm_response(prompt)
                 
                 if next_action.startswith("ERROR:"):
@@ -179,7 +168,7 @@ class Agent:
         return prompt
 
 async def main():
-    agent = Agent(llm_type="gpt-4")
+    agent = Agent(llm_type="gpt-4o")
     query = "What is the capital of France?"
     trajectory = await agent.run(query)
     
