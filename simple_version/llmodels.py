@@ -1,7 +1,9 @@
 import os
 import time
 import random
+from typing import List, Dict, Any, Optional
 from dotenv import load_dotenv
+
 
 import openai
 import anthropic
@@ -73,53 +75,6 @@ def retry_with_exponential_backoff(
 def completions_with_backoff(**kwargs):
     return openai.ChatCompletion.create(**kwargs)
 
-
-def gpt3(prompt, model="text-davinci-002", temperature=1.0, max_tokens=100, n=1, stop=None) -> list:
-    outputs = []
-    for _ in range(n):
-        response = openai.Completion.create(
-            engine=model,
-            prompt=prompt,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            n=1,
-            stop=stop
-        )
-        outputs.append(response.choices[0].text.strip())
-    return outputs
-
-def gpt(prompt, model="gpt-3.5-turbo-16k", temperature=1.0, max_tokens=100, n=1, stop=None) -> list:
-    response = []
-    if model == "text-davinci-002":
-        response = gpt3(prompt, model, temperature, max_tokens, n, stop)        
-    else:
-        messages = [{"role": "user", "content": prompt}]
-        response = chatgpt(messages, model=model, temperature=temperature, max_tokens=max_tokens, n=n, stop=stop)
-    return response
-
-def gpt4(prompt, model="gpt-4o", temperature=0.2, max_tokens=100, n=1, stop=None) -> list:
-    logger.debug(f"{model} prompt: {prompt} #END")
-    response = []
-    if model == "text-davinci-002":
-        response =  gpt3(prompt, model, temperature, max_tokens, n, stop)
-    else:
-        messages = [{"role": "user", "content": prompt}]
-        response =  chatgpt(messages, model=model, temperature=temperature, max_tokens=max_tokens, n=n, stop=stop)
-    logger.debug(f"gpt4 response: {response}")
-    return response
-
-def chatgpt(messages, model="gpt-4o", temperature=1.0, max_tokens=100, n=1, stop=None) -> list:
-    global completion_tokens, prompt_tokens
-    outputs = []
-    while n > 0:
-        cnt = min(n, 20)
-        n -= cnt
-        res = completions_with_backoff(model=model, messages=messages, temperature=temperature, max_tokens=max_tokens, n=cnt, stop=stop)
-        outputs.extend([choice["message"]["content"] for choice in res["choices"]])
-        completion_tokens += res["usage"]["completion_tokens"]
-        prompt_tokens += res["usage"]["prompt_tokens"]
-    return outputs
-
 def claude(prompt, model="claude-2", temperature=1.0, max_tokens=100, n=1, stop=None) -> list:
     client = anthropic.Client(api_key=anthropic_api_key)
     outputs = []
@@ -149,24 +104,135 @@ def gemini(prompt, model="gemini-pro", temperature=1.0, max_tokens=100, n=1, sto
         outputs.append(response.text.strip())
     return outputs
 
-def llm(prompt, model="gpt-3.5-turbo-16k", temperature=1.0, max_tokens=100, n=1, stop=None) -> list:
-    if model.startswith("gpt"):
-        return gpt(prompt, model, temperature, max_tokens, n, stop)
-    elif model.startswith("claude"):
-        return claude(prompt, model, temperature, max_tokens, n, stop)
-    elif model.startswith("gemini"):
-        return gemini(prompt, model, temperature, max_tokens, n, stop)
-    else:
-        raise ValueError(f"Unsupported model: {model}")
-
-def gpt_usage(backend="gpt-4"):
+async def chatgpt(messages: List[Dict[str, str]], 
+                 model: str = "gpt-4o", 
+                 temperature: float = 1.0, 
+                 max_tokens: int = 100, 
+                 n: int = 1, 
+                 stop: Optional[List[str]] = None) -> List[str]:
+    """Async function to interact with ChatGPT models"""
     global completion_tokens, prompt_tokens
-    if backend == "gpt-4":
-        cost = completion_tokens / 1000 * 0.06 + prompt_tokens / 1000 * 0.03
-    elif backend == "gpt-3.5-turbo":
-        cost = completion_tokens / 1000 * 0.002 + prompt_tokens / 1000 * 0.0015
-    elif backend == "gpt-3.5-turbo-16k":
-        cost = completion_tokens / 1000 * 0.004 + prompt_tokens / 1000 * 0.003
+    outputs = []
+    
+    try:
+        while n > 0:
+            cnt = min(n, 20)
+            n -= cnt
+            
+            # Special handling for gpt-4o and gpt-4o mini
+            if model in ["gpt-4o", "gpt-4o-mini"]:
+                logger.debug(f"Using {model} configuration")
+                # Adjust parameters based on the specific model
+                if model == "gpt-4o":
+                    temperature = min(temperature, 0.7)  # Cap temperature for gpt-4o
+                elif model == "gpt-4o-mini":
+                    temperature = min(temperature, 0.5)  # Cap temperature for gpt-4o mini
+                # You can add more parameter adjustments if needed
+                
+            response = await asyncio.wait_for(
+                async_openai_call(
+                    messages=messages,
+                    model=model,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    n=cnt,
+                    stop=stop
+                ),
+                timeout=30
+            )
+            
+            outputs.extend([choice["message"]["content"] for choice in response["choices"]])
+            completion_tokens += response["usage"]["completion_tokens"]
+            prompt_tokens += response["usage"]["prompt_tokens"]
+            
+        return outputs
+        
+    except asyncio.TimeoutError:
+        logger.error("OpenAI API call timed out")
+        raise TimeoutError("OpenAI API call timed out after 30 seconds")
+    except Exception as e:
+        logger.error(f"Error in chatgpt call: {str(e)}")
+        raise
+
+async def gpt4o(prompt: str, 
+              model: str = "gpt-4o", 
+              temperature: float = 0.2, 
+              max_tokens: int = 100, 
+              n: int = 1, 
+              stop: Optional[List[str]] = None) -> List[str]:
+    """Specialized async function for GPT-4 interactions with gpt-4o and gpt-4o mini support"""
+    logger.debug(f"{model} prompt: {prompt} #END")
+    
+    try:
+        messages = [{"role": "user", "content": prompt}]
+        
+        # Special handling for gpt-4o and gpt-4o mini requests
+        if model in ["gpt-4o", "gpt-4o mini"]:
+            logger.debug(f"Using {model} configuration")
+            # Adjust configuration for gpt-4o and gpt-4o mini
+            temperature = min(temperature, 0.7) if model == "gpt-4o" else min(temperature, 0.5)
+            max_tokens = min(max_tokens, MAX_TOKENS)  # Ensure within limits
+        
+        response = await chatgpt(
+            messages=messages,
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            n=n,
+            stop=stop
+        )
+        
+        logger.debug(f"##gpt4o response: {response} #END")
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error in gpt4o call: {str(e)}")
+        raise
+
+async def llm(prompt: str, 
+             model: str = "gpt-4o", 
+             temperature: float = 1.0, 
+             max_tokens: int = 100, 
+             n: int = 1, 
+             stop: Optional[List[str]] = None) -> List[str]:
+    """Main async interface for all LLM models"""
+    try:
+        if model.startswith("gpt"):
+            return await gpt4o(prompt, model, temperature, max_tokens, n, stop)
+        elif model.startswith("claude"):
+            return await claude(prompt, model, temperature, max_tokens, n, stop)
+        elif model.startswith("gemini"):
+            return await gemini(prompt, model, temperature, max_tokens, n, stop)
+        else:
+            raise ValueError(f"Unsupported model: {model}")
+    except Exception as e:
+        logger.error(f"Error in llm call: {str(e)}")
+        raise
+
+def gpt_usage(backend: str = "gpt-4o") -> Dict[str, Any]:
+    """Calculate token usage and cost"""
+    global completion_tokens, prompt_tokens
+    
+    # Map gpt-4o and gpt-4o mini to appropriate cost structure
+    if backend in ["gpt-4o", "gpt-4o-mini"]:
+        backend = "gpt-4o"  # Assuming same cost structure for both variants
+    
+    cost_mapping = {
+        "gpt-4o": (0.06, 0.03),  # (completion_cost, prompt_cost) per 1k tokens
+        "gpt-4o-mini": (0.04, 0.02),  # Example costs for gpt-4o mini
+        "gpt-3.5-turbo": (0.002, 0.0015),
+        "gpt-3.5-turbo-16k": (0.004, 0.003)
+    }
+    
+    if backend in cost_mapping:
+        completion_cost, prompt_cost = cost_mapping[backend]
+        cost = (completion_tokens / 1000 * completion_cost + 
+                prompt_tokens / 1000 * prompt_cost)
     else:
-        cost = 0  # For non-GPT models, we don't calculate cost
-    return {"completion_tokens": completion_tokens, "prompt_tokens": prompt_tokens, "cost": cost}
+        cost = 0
+    
+    return {
+        "completion_tokens": completion_tokens,
+        "prompt_tokens": prompt_tokens,
+        "cost": cost
+    }
