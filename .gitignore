@@ -28,6 +28,7 @@ MANIFEST
 
 logs_*/
 .DS_Store
+tmp/*
 
 
 # PyInstaller

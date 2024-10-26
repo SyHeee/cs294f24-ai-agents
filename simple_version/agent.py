@@ -200,12 +200,11 @@ class Agent:
         
         try:            
             response = await asyncio.wait_for(
-                asyncio.to_thread(
-                    llm,
+                llm(
                     prompt,
                     model=self.llm_type,
                     temperature=self.temperature,
-                    max_tokens=MAX_TOKENS  # Using the constant from llmodels.py
+                    max_tokens=MAX_TOKENS
                 ),
                 timeout=30
             )
@@ -220,7 +219,6 @@ class Agent:
         except Exception as e:
             self.logger.error(f"Error getting LLM response: {e}")
             return f"ERROR: {str(e)}"
-
     async def run(self, initial_query: str, max_steps: int = 5):
         """Main execution loop"""
         await self.setup()

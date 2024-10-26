@@ -2,7 +2,7 @@
 playwright==1.47.0
 
 # OpenAI API
-openai==1.42.0
+openai==1.52.0
 
 # Anthropic API for Claude
 anthropic==0.3.11
