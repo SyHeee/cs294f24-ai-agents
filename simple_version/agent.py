@@ -40,7 +40,7 @@ class Agent:
         Generate a specific plan including website to visit, search terms, and target elements."""
         
         user_prompt = f"""Query: {query}
-        Generate a structured web action plan."""
+        Generate a structured web action plan in json."""
         
         combined_prompt = f"{system_prompt}\n{user_prompt}"
         
@@ -83,31 +83,9 @@ class Agent:
         
         try:
             # Default set of actions based on the plan
-            actions = [
-                {
-                    "action": "goto",
-                    "value": action_plan["website"],
-                    "description": f"Navigate to {action_plan['website']}"
-                }
-            ]
+            actions = []
             
-            # Add search action if there's a search query
-            if action_plan.get("search_query"):
-                actions.extend([
-                    {
-                        "action": "type",
-                        "selector": 'input[name="q"], textarea[name="q"]',
-                        "value": action_plan["search_query"],
-                        "description": f"Type search query: {action_plan['search_query']}"
-                    },
-                    {
-                        "action": "press",
-                        "key": "Enter",
-                        "description": "Submit search"
-                    }
-                ])
-            
-            # Add any additional actions from the plan
+            # Add actions from the plan
             for action in action_plan.get("actions", []):
                 actions.append(action)
             
@@ -125,35 +103,48 @@ class Agent:
         try:
             observation = ""
             
-            if action["action"] == "goto":
-                await self.page.goto(action["value"], wait_until="networkidle", timeout=10000)
-                observation = f"Navigated to {action['value']}"
+            if action["action"] == "navigate":
+                url = action["parameters"]["url"]
+                await self.page.goto(url, wait_until="networkidle", timeout=10000)
+                observation = f"Navigated to {url}"
                 
-            elif action["action"] == "type":
-                element = await self.page.wait_for_selector(action["selector"], timeout=5000)
-                await element.fill(action["value"])
-                observation = f"Typed '{action['value']}'"
+            elif action["action"] in ["enter_text", "enter_search"]:
+                selector = 'input[name="q"], textarea[name="q"]'
+                element = await self.page.wait_for_selector(selector, timeout=5000)
+                if "text" in action["parameters"]:
+                    key = "text"
+                elif "query" in action["parameters"]:
+                    key = "query"
+                await element.fill(action["parameters"][key])
+                observation = f"""Typed '{action["parameters"][key]}'"""
                 
-            elif action["action"] == "press":
-                await self.page.keyboard.press(action["key"])
+            elif action["action"] == "press_enter":
+                await self.page.keyboard.press("Enter")
                 await self.page.wait_for_load_state("networkidle", timeout=10000)
-                observation = f"Pressed {action['key']}"
+                observation = f"Pressed Enter"
                 
+            elif action["action"] == "extract_text":
+                await self.page.wait_for_load_state("networkidle", timeout=10000)
+                h3 = self.page.locator('h3').first
+                firstResult = await h3.inner_text()
+                print(firstResult)
+                observation = f"Retrieved " + firstResult
+            
             elif action["action"] == "click":
-                if "selector" in action:
-                    await self.page.click(action["selector"], timeout=5000)
-                else:
-                    await self.page.click(f"text={action['value']}", timeout=5000)
-                await self.page.wait_for_load_state("networkidle", timeout=10000)
-                observation = f"Clicked on {action.get('selector', action.get('value'))}"
-                
-            await self.log_action(action["description"], observation)
+                if "element" in action["parameters"]:
+                    button_name = action["parameters"]["element"].replace(' button', '')
+                elif "target" in action["parameters"]:
+                    button_name = action["parameters"]["target"].replace(' button', '')
+                await self.page.get_by_label(button_name).first.click()
+                observation = f"Clicked {button_name}"
+
+            await self.log_action(action["action"], observation)
             return observation
             
         except Exception as e:
             error_msg = f"Error executing {action['action']}: {str(e)}"
             self.logger.error(error_msg)
-            await self.log_action(action["description"], error_msg)
+            await self.log_action(action['action'], error_msg)
             return error_msg
 
     async def setup(self):
@@ -168,8 +159,8 @@ class Agent:
     async def cleanup(self):
         """Clean up browser resources"""
         self.logger.info("Cleaning up...")
-        if self.browser:
-            await self.browser.close()
+        # if self.browser:
+        #     await self.browser.close()
         self.logger.info("Browser closed.")
 
     async def take_screenshot(self):
@@ -226,7 +217,6 @@ class Agent:
             # Analyze the task first
             action_plan = await self.analyze_task(initial_query)
             grounded_actions = await self.ground_action(action_plan)
-            
             # Execute initial actions
             for action in grounded_actions:
                 await self.execute_action(action)
@@ -260,7 +250,7 @@ class Agent:
 
     def generate_prompt(self) -> str:
         """Generate prompt for next action based on trajectory"""
-        prompt = "Based on the following trajectory, what should be the next action?\n\n"
+        prompt = "Based on the following trajectory, what should be the next action in json?\n\n"
         for step in self.trajectory[-5:]:  # Only use the last 5 steps
             prompt += f"Step {step['step']}:\nAction: {step['action']}\nObservation: {step['observation']}\n\n"
         prompt += "Next Action:"
