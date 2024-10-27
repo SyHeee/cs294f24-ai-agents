@@ -54,15 +54,7 @@ class Agent:
                 "target_elements": ["search input", "search results"],
                 "actions": []
             }
-            
-            try:
-                # Try to parse LLM response as JSON if it's formatted that way
-                parsed_response = json.loads(llm_response)
-                action_plan.update(parsed_response)
-            except json.JSONDecodeError:
-                # If not JSON, use the raw response as the search query
-                action_plan["search_query"] = llm_response.strip()
-            
+                        
             self.logger.info(f"Generated action plan for query: {query}")
             return action_plan
             
