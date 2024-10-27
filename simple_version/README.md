@@ -11,6 +11,12 @@ pip install -r requirement.txt
 playwright install
 ```
 
+## Create a .env file under simple_version/ and set your API keys
+```bash
+OPENAI_API_KEY=...
+```
+
+
 ## Run the main code
 ```bash
 python agent.py

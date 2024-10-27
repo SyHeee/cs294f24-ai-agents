@@ -25,4 +25,3 @@ pytest==7.4.3
 black==23.12.1
 isort==5.13.2
 flake8==6.1.0
-

@@ -101,7 +101,7 @@ async def chatgpt(messages: List[Dict[str, str]],
                 logger.debug(f"Using {model} configuration")
                 # Map to actual model names
                 actual_model = "gpt-4" if model == "gpt-4o" else "gpt-4-1106-preview"
-                temperature = min(temperature, 0.7) if model == "gpt-4o" else min(temperature, 0.5)
+                temperature = min(temperature, 0.0) if model == "gpt-4o" else min(temperature, 0.0)
             else:
                 actual_model = model
             
@@ -112,7 +112,8 @@ async def chatgpt(messages: List[Dict[str, str]],
                     temperature=temperature,
                     max_tokens=max_tokens,
                     n=cnt,
-                    stop=stop
+                    stop=stop,
+                    response_format={"type": "json_object"},
                 ),
                 timeout=30
             )
@@ -137,7 +138,7 @@ async def gpt4(prompt: str,
               n: int = 1, 
               stop: Optional[List[str]] = None) -> List[str]:
     """Specialized async function for GPT-4 interactions"""
-    logger.debug(f"{model} prompt: {prompt} #END")
+    logger.debug(f"{model} prompt: {prompt} # promptEND")
     
     try:
         messages = [{"role": "user", "content": prompt}]
@@ -157,7 +158,7 @@ async def gpt4(prompt: str,
             stop=stop
         )
         
-        logger.debug(f"##gpt4 response: {response} #END")
+        logger.debug(f"##gpt4 response: {response} #responseEND")
         return response
         
     except Exception as e:

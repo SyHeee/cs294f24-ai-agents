@@ -12,6 +12,7 @@ import json
 
 from prompts import _initialize_prompt
 from utils import setup_logging, get_log_dir
+from parse_web_action import execute_action
 
 class Agent:
     def __init__(self, 
@@ -40,7 +41,7 @@ class Agent:
         Generate a specific plan including website to visit, search terms, and target elements."""
         
         user_prompt = f"""Query: {query}
-        Generate a structured web action plan."""
+        Generate a structured web action plan in json."""
         
         combined_prompt = f"{system_prompt}\n{user_prompt}"
         
@@ -54,7 +55,15 @@ class Agent:
                 "target_elements": ["search input", "search results"],
                 "actions": []
             }
-                        
+            
+            try:
+                # Try to parse LLM response as JSON if it's formatted that way
+                parsed_response = json.loads(llm_response)
+                action_plan.update(parsed_response)
+            except json.JSONDecodeError:
+                # If not JSON, use the raw response as the search query
+                action_plan["search_query"] = llm_response.strip()
+            
             self.logger.info(f"Generated action plan for query: {query}")
             return action_plan
             
@@ -75,31 +84,9 @@ class Agent:
         
         try:
             # Default set of actions based on the plan
-            actions = [
-                {
-                    "action": "goto",
-                    "value": action_plan["website"],
-                    "description": f"Navigate to {action_plan['website']}"
-                }
-            ]
+            actions = []
             
-            # Add search action if there's a search query
-            if action_plan.get("search_query"):
-                actions.extend([
-                    {
-                        "action": "type",
-                        "selector": 'input[name="q"], textarea[name="q"]',
-                        "value": action_plan["search_query"],
-                        "description": f"Type search query: {action_plan['search_query']}"
-                    },
-                    {
-                        "action": "press",
-                        "key": "Enter",
-                        "description": "Submit search"
-                    }
-                ])
-            
-            # Add any additional actions from the plan
+            # Add actions from the plan
             for action in action_plan.get("actions", []):
                 actions.append(action)
             
@@ -114,45 +101,15 @@ class Agent:
         """
         Execute a single browser action using Playwright and return observation
         """
-        try:
-            observation = ""
-            
-            if action["action"] == "goto":
-                await self.page.goto(action["value"], wait_until="networkidle", timeout=10000)
-                observation = f"Navigated to {action['value']}"
-                
-            elif action["action"] == "type":
-                element = await self.page.wait_for_selector(action["selector"], timeout=5000)
-                await element.fill(action["value"])
-                observation = f"Typed '{action['value']}'"
-                
-            elif action["action"] == "press":
-                await self.page.keyboard.press(action["key"])
-                await self.page.wait_for_load_state("networkidle", timeout=10000)
-                observation = f"Pressed {action['key']}"
-                
-            elif action["action"] == "click":
-                if "selector" in action:
-                    await self.page.click(action["selector"], timeout=5000)
-                else:
-                    await self.page.click(f"text={action['value']}", timeout=5000)
-                await self.page.wait_for_load_state("networkidle", timeout=10000)
-                observation = f"Clicked on {action.get('selector', action.get('value'))}"
-                
-            await self.log_action(action["description"], observation)
-            return observation
-            
-        except Exception as e:
-            error_msg = f"Error executing {action['action']}: {str(e)}"
-            self.logger.error(error_msg)
-            await self.log_action(action["description"], error_msg)
-            return error_msg
+        observation = await execute_action(self.page, action)
+        await self.log_action(action["action"], observation)
+        return observation
 
     async def setup(self):
         """Initialize browser and create new page"""
         self.logger.info("Setting up the browser...")
-        playwright = await async_playwright().start()
-        self.browser = await playwright.chromium.launch(headless=self.headless)
+        self.playwright = await async_playwright().start()
+        self.browser = await self.playwright.chromium.launch(headless=self.headless)
         self.context = await self.browser.new_context()
         self.page = await self.context.new_page()
         self.logger.info("Browser setup complete.")
@@ -160,8 +117,20 @@ class Agent:
     async def cleanup(self):
         """Clean up browser resources"""
         self.logger.info("Cleaning up...")
-        if self.browser:
-            await self.browser.close()
+        try:
+            if self.page:
+                await self.page.close()  # Close the page if it exists
+                self.page = None  # Clear reference
+            if self.context:
+                await self.context.close()  # Close the context if it exists
+                self.context = None  # Clear reference
+            if self.browser:
+                await self.browser.close()  # Close the browser if it exists
+                self.browser = None  # Clear reference
+        finally:
+            if self.playwright:
+                await self.playwright.stop()  # Stop the Playwright instance
+                self.playwright = None  # Clear reference
         self.logger.info("Browser closed.")
 
     async def take_screenshot(self):
@@ -211,39 +180,64 @@ class Agent:
         except Exception as e:
             self.logger.error(f"Error getting LLM response: {e}")
             return f"ERROR: {str(e)}"
+        
+    async def is_done(self, query: str) -> dict:
+        """
+        Analyze the trajectory to see if one should stop
+        """
+        system_prompt = """Analyze the query and the existing search results.
+        Return whether one can answer the question given the search results."""
+        
+        user_prompt = f"""Query: {query}, Current search results: {self.trajectory}
+        Can we stop searching and give answer for the query right now? 
+        Answer in json, must contain attribute can_stop_search (True or False), 
+        reason (Why we can stop or not), 
+        final_answer (final answer to the query if we can answer the query)."""
+        
+        combined_prompt = f"{system_prompt}\n{user_prompt}"
+
+        llm_response = await self.get_llm_response(combined_prompt)
+
+        self.logger.info(f"got response : {llm_response}")
+        return json.loads(llm_response)
+            
     async def run(self, initial_query: str, max_steps: int = 5):
         """Main execution loop"""
-        await self.setup()
         try:
+            await self.setup()
             # Analyze the task first
             action_plan = await self.analyze_task(initial_query)
             grounded_actions = await self.ground_action(action_plan)
-            
             # Execute initial actions
             for action in grounded_actions:
                 await self.execute_action(action)
             
-            # Continue with dynamic action generation
-            for step in range(len(grounded_actions), max_steps):
-                self.logger.info(f"Starting step {step + 1} of {max_steps}")
-                prompt = self.generate_prompt()
-                next_action = await self.get_llm_response(prompt)
-                
-                if next_action.startswith("ERROR:"):
-                    self.logger.error(f"LLM error: {next_action}")
-                    break
-                
-                # Convert LLM response to action
-                try:
-                    action = {
-                        "action": "click" if next_action.lower().startswith("click") else "search",
-                        "value": next_action.split(None, 1)[1].strip(),
-                        "description": next_action
-                    }
-                    await self.execute_action(action)
-                except Exception as e:
-                    self.logger.error(f"Error executing action: {e}")
-                    break
+            result = await self.is_done(initial_query)
+
+            if result["can_stop_search"]:
+                self.trajectory.append(result)
+            else:
+                # Continue with dynamic action generation
+                for step in range(len(grounded_actions), max_steps):
+                    self.logger.info(f"Starting step {step + 1} of {max_steps}")
+                    prompt = self.generate_prompt()
+                    next_action = await self.get_llm_response(prompt)
+                    
+                    if next_action.startswith("ERROR:"):
+                        self.logger.error(f"LLM error: {next_action}")
+                        break
+                    
+                    # Convert LLM response to action
+                    try:
+                        action = {
+                            "action": "click" if next_action.lower().startswith("click") else "search",
+                            "value": next_action.split(None, 1)[1].strip(),
+                            "description": next_action
+                        }
+                        await self.execute_action(action)
+                    except Exception as e:
+                        self.logger.error(f"Error executing action: {e}")
+                        break
         
         finally:
             await self.cleanup()
@@ -252,7 +246,7 @@ class Agent:
 
     def generate_prompt(self) -> str:
         """Generate prompt for next action based on trajectory"""
-        prompt = "Based on the following trajectory, what should be the next action?\n\n"
+        prompt = "Based on the following trajectory, what should be the next action in json?\n\n"
         for step in self.trajectory[-5:]:  # Only use the last 5 steps
             prompt += f"Step {step['step']}:\nAction: {step['action']}\nObservation: {step['observation']}\n\n"
         prompt += "Next Action:"
@@ -260,16 +254,18 @@ class Agent:
 
 async def main():
     agent = Agent(llm_type="gpt-4o-mini")
-    query = "What is the capital of France?"
+    query = "What is the capital city of France?"
     trajectory = await agent.run(query)
     
     print("\nFinal Trajectory:")
-    for step in trajectory:
+    for step in trajectory[:-1]:
         print(f"Step {step['step']}:")
         print(f"Action: {step['action']}")
         print(f"Observation: {step['observation']}")
         print(f"Screenshot: {step['screenshot']}")
         print()
+    print(trajectory[-1]["final_answer"])
+    
 
 if __name__ == "__main__":
     asyncio.run(main())
