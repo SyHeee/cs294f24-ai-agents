@@ -138,7 +138,7 @@ async def gpt4(prompt: str,
               n: int = 1, 
               stop: Optional[List[str]] = None) -> List[str]:
     """Specialized async function for GPT-4 interactions"""
-    logger.debug(f"{model} prompt: {prompt} #END")
+    logger.debug(f"{model} prompt: {prompt} # promptEND")
     
     try:
         messages = [{"role": "user", "content": prompt}]
@@ -158,7 +158,7 @@ async def gpt4(prompt: str,
             stop=stop
         )
         
-        logger.debug(f"##gpt4 response: {response} #END")
+        logger.debug(f"##gpt4 response: {response} #responseEND")
         return response
         
     except Exception as e:
