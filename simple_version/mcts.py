@@ -1,8 +1,10 @@
 import numpy as np
 import logging
 from abc import ABC
-from environments import WikiEnv, HotPotQAWrapper, LoggingWrapper
+from environment import WikiEnv, HotPotQAWrapper, LoggingWrapper
 import requests
+import string
+from dataclasses import dataclass
 
 env = WikiEnv()
 env = HotPotQAWrapper(env, split="train")
@@ -16,30 +18,47 @@ class gpt(ABC):
         ...
 
 
+
+@dataclass
+class State:
+    """ Definition of a state in the tree.
+    """
+    ###[TODO]: Define the state variables.
+    thought: str = ''
+    action: str = ''
+    observation: str = ''
+
+    def __str__(self):
+        return f"State(thought={self.thought}, action={self.action}, observation={self.observation})"
+
+
 class Node:
     """ Definition of a basic node in the tree.
     """
-    def __init__(self, state, question, parent=None):
-        self.state = {
-            'thought': '', 
-            'action': '', 
-            'observation': ''
-        } if state is None else state
+    def __init__(self, parent=None):
+        
         self.parent = parent
-        self.question = question
         self.children = []
-        self.visits = 0
-        self.value = 0
-        self.depth = 0 if parent is None else parent.depth + 1
-        self.is_terminal = False
-        self.reward = 0
-        self.exhausted = False # If all children are terminal
-        self.em = 0  # Exact match, evaluation metric
+        self.value = -1
+        self.depth = 0 # by default it is a root node
+        self.id = '0a' # by default it is a root node
 
     def __str__(self):
         """Return a string representation of the node.
         """
-        return f"Node(depth={self.depth}, value={self.value:.2f}, visits={self.visits}, thought={self.state['thought']}, action={self.state['action']}, observation={self.state['observation']})"
+        return f"Node(id={self.id}, depth={self.depth}, value={self.value:.2f})"
+
+    def _reset_node_id(self):
+        """Reset the node id for all the children. e.g. if a node is at depth 2 and has 3 children, 
+        the children will be at depth 3 and their node id will be 3a, 3b, 3c.
+        """
+        if self.children == []:
+            return
+        alphabet = string.ascii_lowercase
+        for i, child in self.children:
+            child.depth = self.depth + 1
+            child.id =str(i)+alphabet[i]
+
 
     def state_str(self):
         """Return a string representation of the node's state.
@@ -55,16 +74,10 @@ class Node:
         """Return a dictionary representation of the node.
         """
         return {
-            'state': self.state,
-            'question': self.question,
-            'parent': self.parent.to_dict() if self.parent else None,
-            'children': [child.to_dict() for child in self.children],
-            'visits': self.visits,
+            'parent': self.parent.__str__() if self.parent else None,
+            'children': [child.__str__() for child in self.children],
             'value': self.value,
             'depth': self.depth,
-            'is_terminal': self.is_terminal,
-            'reward': self.reward,
-            'em': self.em,
         }
     
     @property
@@ -78,15 +91,41 @@ class Node:
 class MCTSNode(Node):
     """ Definition of a node in the MCTS tree.
     """
-    def __init__(self, state, question, parent=None):
+    def __init__(self, parent=None, state=None, question=None):
         super().__init__(state, question, parent)
+        self.state = State() if state is None else state
+        self.question = question
+        self.visits = 0
+        self.is_terminal = False
+        self.reward = 0
+        self.exhausted = False # If all children are terminal
+        self.em = 0  # Exact match, evaluation metric
 
-    def value(self):
-        """Return the value of the node.
+
+    def __str__(self):
+        """Return a string representation of the node.
         """
-        return self._uct(C1=1, C2=1, with_depth=False)
+        return f"Node(id={self.id}, depth={self.depth}, value={self.value:.2f}, visits={self.visits})"
+
+
+    def to_dict(self):
+        """Return a dictionary representation of the node.
+        """
+        return {
+            'state': self.state,
+            'question': self.question,
+            'parent': self.parent.__str__() if self.parent else None,
+            'children': [child.__str__() for child in self.children],
+            'visits': self.visits,
+            'value': self.value,
+            'depth': self.depth,
+            'is_terminal': self.is_terminal,
+            'reward': self.reward,
+            'em': self.em,
+        }
+
     
-    def _uct(self, C1=1, C2=1, with_depth=False):
+    def uct(self, C1=1, C2=1, with_depth=False):
         """Upper Confidence bounds applied to Trees (Kocsis and Szepesv ́ ari, 2006). This implementation is copied from the LATS code but slight different from the LATS paper.
 
         Parameters:
