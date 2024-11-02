@@ -460,6 +460,7 @@ async def main(config, base_dir) -> None:
                         for prompt_i in prompt:
                             logger.info(prompt_i)
 
+                    # import pdb; pdb.set_trace()
                     output0 = generation_model.generate(prompt=prompt, image_path=input_image_path, turn_number=0)
 
                     terminal_width = 10
