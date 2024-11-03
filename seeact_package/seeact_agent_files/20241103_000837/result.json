@@ -1,8 +1,0 @@
-{
-    "task": [
-        "Find the capitical city of France"
-    ],
-    "website": "https://www.google.com/",
-    "num_step": 0,
-    "action_history": []
-}
