@@ -1,0 +1,43 @@
+[basic]
+save_file_dir = "./seeact_agent_files"
+default_task = "Find the capitical city of France"
+default_website = "https://www.google.com/"
+crawler_mode = false
+crawler_max_steps = 10
+
+[agent]
+input_info = [ "screenshot",]
+grounding_strategy = "text_choice_som"
+max_auto_op = 50
+max_continuous_no_op = 5
+highlight = false
+
+[openai]
+rate_limit = -1
+model = "gpt-4o"
+temperature = 0.7
+api_key = "Your API key here"
+
+[oss_model]
+
+[mcts]
+max_tabs = 8
+exploration_weight = 1.414
+
+[browser]
+headless = false
+args = []
+browser_app = "chrome"
+persistant = false
+persistant_user_path = ""
+save_video = false
+tracing = false
+
+[browser.viewport]
+width = 1280
+height = 720
+
+[browser.trace]
+screenshots = true
+snapshots = true
+sources = true
