@@ -1,5 +1,34 @@
 
 
+ACTION_SPACE = """
+Here are the descriptions of all allowed actions:
+
+No Value Operations:
+- CLICK: Click on a webpage element using the mouse.
+- HOVER: Move the mouse over a webpage element without clicking.
+- PRESS ENTER: Press the Enter key, typically to submit a form or confirm an input.
+- SCROLL UP: Scroll the webpage upwards by half of the window height.
+- SCROLL DOWN: Scroll the webpage downwards by half of the window height.
+- PRESS HOME: Scroll to the top of the webpage.
+- PRESS END: Scroll to the bottom of the webpage.
+- PRESS PAGEUP: Scroll up by one window height.
+- PRESS PAGEDOWN: Scroll down by one window height.
+- CLOSE TAB: Close the current tab in the browser.
+- NEW TAB: Open a new tab in the browser.
+- GO BACK: Navigate to the previous page in the browser history.
+- GO FORWARD: Navigate to the next page in the browser history.
+- TERMINATE: End the current task, typically used when the task is considered complete or requires potentially harmful actions.
+- NONE: Indicates that no action is necessary at this stage. Used to skip an action or wait.
+
+With Value Operations:
+- SELECT: Choose an option from a dropdown menu or <select> element. The value indicates the option to select.
+- TYPE: Enter text into a text area or text box. The value is the text to be typed.
+- GOTO: Navigate to a specific URL. The value is the URL to navigate to.
+- SAY: Output answers or other information you want to tell the user.
+- MEMORIZE: Keep some content into action history to memorize it.
+"""
+
+
 def _initialize_prompt():
         """Initialize prompt information including dynamic action space."""
         action_format = f"ACTION: Choose an action from allowed actions."  # Dynamically generate action_format based on self.action_space

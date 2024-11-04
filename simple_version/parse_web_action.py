@@ -4,7 +4,7 @@ from rapidfuzz import process
 import numpy as np
 
 
-async def execute_action(page, action: dict) -> str:
+async def _execute_action(page, action: dict) -> str:
     """
     Execute a single browser action using Playwright and return observation
     """
