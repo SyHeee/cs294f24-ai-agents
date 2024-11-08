@@ -323,17 +323,18 @@ ELEMENT: The uppercase letter of your choice.''',
 
     async def start(self, headless=None, args=None, website=None):
         self.playwright = await async_playwright().start()
-        self.session_control['browser'] = await normal_launch_async(self.playwright,
-                                                                    headless=self.config['browser'][
-                                                                        'headless'] if headless is None else headless,
-                                                                    args=self.config['browser'][
-                                                                        'args'] if args is None else args)
-        self.session_control['context'] = await normal_new_context_async(self.session_control['browser'],
-                                                                         viewport=self.config['browser'][
-                                                                             'viewport'])
+        self.session_control['browser'] = await normal_launch_async(
+            self.playwright,
+            headless=self.config['browser']['headless'] if headless is None else headless,
+            args=self.config['browser']['args'] if args is None else args
+        )
+        self.session_control['context'] = await normal_new_context_async(
+            self.session_control['browser'],
+            viewport=self.config['browser']['viewport']
+        )
 
         self.session_control['context'].on("page", self.page_on_open_handler)
-        # import pdb; pdb.set_trace()
+
         await self.session_control['context'].new_page()
         
         if self.config["basic"]["crawler_mode"] is True:
@@ -491,8 +492,10 @@ ELEMENT: The uppercase letter of your choice.''',
             pass
 
 
-        elements = await get_interactive_elements_with_playwright(self.page,
-                                                                  self.config['browser']['viewport'])
+        elements = await get_interactive_elements_with_playwright(
+            self.page,
+            self.config['browser']['viewport']
+        )
 
         '''
              0: center_point =(x,y)
@@ -538,9 +541,14 @@ ELEMENT: The uppercase letter of your choice.''',
                     mark_page_script = f.read()
                 await self.page.evaluate(mark_page_script)
                 await self.page.evaluate("unmarkPage()")
-                await self.page.evaluate("""elements => {
-                    return window.som.drawBoxes(elements);
-                    }""", elements)
+                await self.page.evaluate(
+                    """
+                    elements => {
+                        return window.som.drawBoxes(elements);
+                    }
+                    """, 
+                    elements
+                )
         except Exception as e:
             self.logger.info(f"Mark page script error {e}")
 

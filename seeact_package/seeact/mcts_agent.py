@@ -335,14 +335,15 @@ ELEMENT: The uppercase letter of your choice.''',
 
     async def start(self, headless=None, args=None, website=None):
         self.playwright = await async_playwright().start()
-        self.session_control['browser'] = await normal_launch_async(self.playwright,
-                                                                    headless=self.config['browser'][
-                                                                        'headless'] if headless is None else headless,
-                                                                    args=self.config['browser'][
-                                                                        'args'] if args is None else args)
-        self.session_control['context'] = await normal_new_context_async(self.session_control['browser'],
-                                                                         viewport=self.config['browser'][
-                                                                             'viewport'])
+        self.session_control['browser'] = await normal_launch_async(
+            self.playwright,
+            headless=self.config['browser']['headless'] if headless is None else headless,
+            args=self.config['browser']['args'] if args is None else args
+        )
+        self.session_control['context'] = await normal_new_context_async(
+            self.session_control['browser'],
+            viewport=self.config['browser']['viewport']
+        )
 
         self.session_control['context'].on("page", self.page_on_open_handler)
         # import pdb; pdb.set_trace()

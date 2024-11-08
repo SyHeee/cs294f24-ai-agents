@@ -1,9 +1,11 @@
 import uuid
 import asyncio
+import numpy as np
 from datetime import datetime
 from typing import Optional, Dict, List
 import logging
 from playwright.async_api import Page, BrowserContext
+from seeact.agent import SeeActAgent
 
 class BrowserState:
     """Represents the state of a browser tab"""

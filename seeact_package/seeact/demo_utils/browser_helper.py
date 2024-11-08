@@ -25,7 +25,7 @@ import os
 async def normal_launch_async(playwright: Playwright,headless=False,args=None):
     browser = await playwright.chromium.launch(
         traces_dir=None,
-        headless=False,
+        headless=headless,
         args=args,
         # ignore_default_args=ignore_args,
         # chromium_sandbox=False,
