@@ -29,7 +29,8 @@ MANIFEST
 logs_*/
 .DS_Store
 tmp/*
-
+seeact_package/seeact_agent_files/*
+seeact_agent_files/*
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
