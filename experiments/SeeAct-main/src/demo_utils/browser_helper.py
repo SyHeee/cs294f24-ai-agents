@@ -401,7 +401,7 @@ async def get_element_description(element, tag_name, role_value, type_value):
 
 async def get_element_data(element, tag_name):
     tag_name_list = ['a', 'button',
-                     'input',
+                     'input','.radio-toolbar label',
                      'select', 'textarea', 'adc-tab']
 
     # await aprint(element,tag_name)

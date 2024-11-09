@@ -159,6 +159,8 @@ async def main(config, base_dir) -> None:
 
     # openai settings
     openai_config = config["openai"]
+    if "api_key" not in openai_config:
+        openai_config = os.environ["OPENAI_API_KEY"]
     if openai_config["api_key"] == "Your API Key Here":
         raise Exception(
             f"Please set your GPT API key first. (in {os.path.join(base_dir, 'config', 'demo_mode.toml')} by default)")
@@ -196,13 +198,16 @@ async def main(config, base_dir) -> None:
     else:
         query_tasks = []
         task_dict = {}
-        task_input = await ainput(
-            f"Please input a task, and press Enter. \nOr directly press Enter to use the default task: {default_task}\nTask: ")
+        # Modified
+        # task_input = await ainput(
+        #    f"Please input a task, and press Enter. \nOr directly press Enter to use the default task: {default_task}\nTask: ")
+        task_input = None # Modified
         if not task_input:
             task_input = default_task
         task_dict["confirmed_task"] = task_input
-        website_input = await ainput(
-            f"Please input the complete URL of the starting website, and press Enter. The URL must be complete (for example, including http), to ensure the browser can successfully load the webpage. \nOr directly press Enter to use the default website: {default_website}\nWebsite: ")
+        # website_input = await ainput(
+        #    f"Please input the complete URL of the starting website, and press Enter. The URL must be complete (for example, including http), to ensure the browser can successfully load the webpage. \nOr directly press Enter to use the default website: {default_website}\nWebsite: ")
+        website_input = None  # Modified
         if not website_input:
             website_input = default_website
         task_dict["website"] = website_input
