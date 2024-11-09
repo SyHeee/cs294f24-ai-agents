@@ -1,0 +1,183 @@
+{
+    "cookies": [
+        {
+            "name": "form_key",
+            "value": "48sDobBMyZbgI61a",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1731256685,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "mage-cache-storage",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "mage-cache-storage-section-invalidation",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "mage-cache-sessid",
+            "value": "true",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "mage-messages",
+            "value": "",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Strict"
+        },
+        {
+            "name": "recently_viewed_product",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "recently_viewed_product_previous",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "recently_compared_product",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "recently_compared_product_previous",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "product_data_storage",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706286,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "private_content_version",
+            "value": "c81ec5740f9ca23045e0148b37b37556",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1765730291.148179,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "PHPSESSID",
+            "value": "62fe4179dec29dc51c4e21d8ec9cbab2",
+            "domain": ".ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706292.13552,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "form_key",
+            "value": "48sDobBMyZbgI61a",
+            "domain": ".ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706292.135668,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "X-Magento-Vary",
+            "value": "9bf9a599123e6402b85cde67144717a08b817412",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706292.135783,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        }
+    ],
+    "origins": [
+        {
+            "origin": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7770",
+            "localStorage": [
+                {
+                    "name": "recently_viewed_product",
+                    "value": "{}"
+                },
+                {
+                    "name": "mage-cache-storage",
+                    "value": "{}"
+                },
+                {
+                    "name": "mage-cache-storage-section-invalidation",
+                    "value": "{}"
+                },
+                {
+                    "name": "recently_viewed_product_previous",
+                    "value": "{}"
+                },
+                {
+                    "name": "product_data_storage",
+                    "value": "{}"
+                },
+                {
+                    "name": "mage-cache-timeout",
+                    "value": "\"2025-11-09T16:38:06.718Z\""
+                },
+                {
+                    "name": "recently_compared_product_previous",
+                    "value": "{}"
+                },
+                {
+                    "name": "recently_compared_product",
+                    "value": "{}"
+                }
+            ]
+        }
+    ]
+}

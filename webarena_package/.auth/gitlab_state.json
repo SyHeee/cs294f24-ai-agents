@@ -1,0 +1,25 @@
+{
+    "cookies": [
+        {
+            "name": "known_sign_in",
+            "value": "YTFNSy9YRVBqcm5kcjJVbk9jWG9PY3lhVnJZRWxCMXM4QkJjUkNMV1cvYXdjNHZPc3pBUkR3dEZxREJhcWdNTWxVQ1VmOC95Q3c5Yi9rMEMvdUoyTThtVml4d3gyQkJLR3hWcTYxUWdTdGZuaHdJQVh3THV6RVpoMGRORWFQNE0tLU1NTUlDd3hOeXFPRXhBRGIxRSs1dkE9PQ%3D%3D--a5bba555b0178e5af4b8f0deb9dd15fc668e2f39",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1732379883.590627,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "_gitlab_session",
+            "value": "7cb027a8bdb292041267aa76d0e2a900",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": -1,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        }
+    ],
+    "origins": []
+}

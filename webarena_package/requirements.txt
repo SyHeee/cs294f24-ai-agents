@@ -1,0 +1,13 @@
+gymnasium
+playwright # this version runs into error on mac, use 1.48.0 instead.
+Pillow
+evaluate
+openai==0.27.0
+types-tqdm
+tiktoken
+aiolimiter
+beartype==0.12.0
+flask
+nltk
+text-generation
+transformers==4.33.2

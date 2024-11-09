@@ -1,0 +1,52 @@
+[Config file]: config_files/0.json
+[Unhandled Error] FileNotFoundError(2, 'No such file or directory')
+Traceback (most recent call last):
+  File "/Users/zhuliang/webarena/run.py", line 245, in test
+    render_helper = RenderHelper(
+  File "/Users/zhuliang/webarena/browser_env/helper_functions.py", line 119, in __init__
+    with open(config_file, "r") as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'config_files/0.json'
+[Config file]: config_files/0.json
+[Unhandled Error] FileNotFoundError(2, 'No such file or directory')
+Traceback (most recent call last):
+  File "/Users/zhuliang/webarena/run.py", line 245, in test
+    render_helper = RenderHelper(
+  File "/Users/zhuliang/webarena/browser_env/helper_functions.py", line 119, in __init__
+    with open(config_file, "r") as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'config_files/0.json'
+[Config file]: config_files/0.json
+[Unhandled Error] AssertionError()
+Traceback (most recent call last):
+  File "/Users/zhuliang/webarena/run.py", line 271, in test
+    assert os.path.exists(_c["storage_state"])
+AssertionError
+[Config file]: config_files/0.json
+[Unhandled Error] AssertionError()
+Traceback (most recent call last):
+  File "/Users/zhuliang/webarena/run.py", line 271, in test
+    assert os.path.exists(_c["storage_state"])
+AssertionError
+[Config file]: config_files/0.json
+[Unhandled Error] AssertionError()
+Traceback (most recent call last):
+  File "/Users/zhuliang/webarena/run.py", line 271, in test
+    assert os.path.exists(_c["storage_state"])
+AssertionError
+[Config file]: config_files/0.json
+[Unhandled Error] AssertionError()
+Traceback (most recent call last):
+  File "/Users/zhuliang/webarena/run.py", line 271, in test
+    assert os.path.exists(_c["storage_state"])
+AssertionError
+[Config file]: config_files/0.json
+[Unhandled Error] AssertionError()
+Traceback (most recent call last):
+  File "/Users/zhuliang/webarena/run.py", line 271, in test
+    assert os.path.exists(_c["storage_state"])
+AssertionError
+[Config file]: config_files/0.json
+[Unhandled Error] AssertionError()
+Traceback (most recent call last):
+  File "/Users/zhuliang/webarena/run.py", line 271, in test
+    assert os.path.exists(_c["storage_state"])
+AssertionError

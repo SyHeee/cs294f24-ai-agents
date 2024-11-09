@@ -1,0 +1,35 @@
+{
+    "cookies": [
+        {
+            "name": "_cookie_check",
+            "value": "1",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/login",
+            "expires": -1,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "REMEMBERME",
+            "value": "QXBwXEVudGl0eVxVc2VyOlRXRnlkbVZzYzBkeVlXNTBUV0Z1TVRNMjoxNzYyNzA2Mjg0OlpEaGtZVGMzTUdNMk1qTTROekV6WmpBNFlXTTNOREUyTm1WbE9UZGhOR05oT1dKaE0yRmxPR1kwWlRRMU1tUmpNRE5sWlRobVpEWTBNV1psTTJJd053PT0%3D",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706284.530244,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "PHPSESSID",
+            "value": "9ef4afd6ce2fc10179c0511fa23b139e",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": -1,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        }
+    ],
+    "origins": []
+}

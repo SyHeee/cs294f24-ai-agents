@@ -1,0 +1,203 @@
+{
+    "cookies": [
+        {
+            "name": "form_key",
+            "value": "2RsTlGsuMq8YHCmf",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1731256685,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "mage-cache-storage",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706287,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "mage-cache-storage-section-invalidation",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706287,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "mage-cache-sessid",
+            "value": "true",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706292,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "mage-messages",
+            "value": "",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706292,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Strict"
+        },
+        {
+            "name": "recently_viewed_product",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706287,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "recently_viewed_product_previous",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706287,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "recently_compared_product",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706287,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "recently_compared_product_previous",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706287,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "product_data_storage",
+            "value": "{}",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706287,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "private_content_version",
+            "value": "966eeda00cddce841a989d70f988cf7c",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1765730291.253705,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "PHPSESSID",
+            "value": "3c51695461cd8507f9f2928368ab86f1",
+            "domain": ".ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706292.135499,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "form_key",
+            "value": "2RsTlGsuMq8YHCmf",
+            "domain": ".ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706292.135612,
+            "httpOnly": false,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "X-Magento-Vary",
+            "value": "9bf9a599123e6402b85cde67144717a08b817412",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1762706292.135686,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "known_sign_in",
+            "value": "OWI2djFxWjFtQS9xRFBScHFwWDJ2S0ZpTC8zZnp3MEFYa3l4MDFzUXBzWm52RmNYYzN0Q25yL0ZuQnQ5WkNFL3NMTnZ4RXplZExLMm5DcWpLNXRocXVKd284UGNPN0w5Smw3MWZvc2Q3VGhkZkM0aVJ3TVRoeXUrcldTNlljb0YtLWc4dkVzbXEyRDBSMzMvR3pTMTJlNEE9PQ%3D%3D--ee3b82f2f83d728fcb92ad3e8327cd6ad7baa2e6",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": 1732379893.459121,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        },
+        {
+            "name": "_gitlab_session",
+            "value": "d836e5f003098083c277a569a31941fa",
+            "domain": "ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+            "path": "/",
+            "expires": -1,
+            "httpOnly": true,
+            "secure": false,
+            "sameSite": "Lax"
+        }
+    ],
+    "origins": [
+        {
+            "origin": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7770",
+            "localStorage": [
+                {
+                    "name": "recently_viewed_product",
+                    "value": "{}"
+                },
+                {
+                    "name": "mage-cache-storage",
+                    "value": "{}"
+                },
+                {
+                    "name": "mage-cache-storage-section-invalidation",
+                    "value": "{}"
+                },
+                {
+                    "name": "recently_viewed_product_previous",
+                    "value": "{}"
+                },
+                {
+                    "name": "product_data_storage",
+                    "value": "{}"
+                },
+                {
+                    "name": "mage-cache-timeout",
+                    "value": "\"2025-11-09T16:38:12.275Z\""
+                },
+                {
+                    "name": "recently_compared_product_previous",
+                    "value": "{}"
+                },
+                {
+                    "name": "recently_compared_product",
+                    "value": "{}"
+                }
+            ]
+        }
+    ]
+}
