@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "clean up",
+            "type": "shell",
+            "command": "rm -rf ${workspaceFolder}/webarena_package/results/*.html",
+            "args": []
+        }
+    ]
+}

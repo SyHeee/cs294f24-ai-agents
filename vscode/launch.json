@@ -1,0 +1,55 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "run.py",
+            "type": "debugpy",
+            "request": "launch",
+            "preLaunchTask": "clean up",
+            "program": "${workspaceFolder}/webarena_package//run.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/webarena_package/",
+            "justMyCode": true,
+            "env": {
+                "HOSTNAME": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+                "SHOPPING": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7770",
+                "SHOPPING_ADMIN": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7780/admin",
+                "REDDIT": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:9999",
+                "GITLAB": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8023",
+                "MAP": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:3000",
+                "WIKIPEDIA": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing",
+                "HOMEPAGE": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:4399" // this is a placeholder
+            },
+            "args": [
+                "--instruction_path", "${workspaceFolder}/webarena_package//agent/prompts/jsons/p_cot_id_actree_2s.json",
+                "--test_start_idx", "0",
+                "--test_end_idx", "10",
+                "--model", "gpt-3.5-turbo",
+                "--result_dir", "./results/"
+            ],
+        },
+        {
+            "name": "minimal",
+            "type": "debugpy",
+            "request": "launch",
+            "preLaunchTask": "clean up",
+            "program": "${workspaceFolder}/webarena_package//minimal_example.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/webarena_package/",
+            "justMyCode": true,
+            "env": {
+                "HOSTNAME": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com",
+                "SHOPPING": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7770",
+                "SHOPPING_ADMIN": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:7780/admin",
+                "REDDIT": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:9999",
+                "GITLAB": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8023",
+                "MAP": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:3000",
+                "WIKIPEDIA": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_Kiwix_guy/Landing",
+                "HOMEPAGE": "http://ec2-3-131-244-37.us-east-2.compute.amazonaws.com:4399" // this is a placeholder
+            }
+        }
+    ]
+}
