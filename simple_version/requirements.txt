@@ -13,17 +13,36 @@ google-generativeai==0.3.1
 # Async support
 asyncio==3.4.3
 
-# # Backoff for API rate limiting
-# backoff==2.2.1
+# Backoff for API rate limiting
+backoff==2.2.1
 
 # Transformers for tokenizer
 transformers==4.36.2
-
 python-dotenv==1.0.1
 # Development tools
 pytest==7.4.3
 black==23.12.1
 isort==5.13.2
 flake8==6.1.0
-
 rapidfuzz==3.10.1
+InquirerPy==0.3.4
+lxml==4.9.3
+litellm==1.35.32
+jsonlines
+numpy
+sentence_transformers
+torch
+protobuf
+BeautifulSoup4
+toml
+aioconsole
+gymnasium
+Pillow
+evaluate
+types-tqdm
+tiktoken
+aiolimiter
+beartype==0.12.0
+flask
+nltk
+text-generation
