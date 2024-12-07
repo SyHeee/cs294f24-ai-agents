@@ -87,8 +87,40 @@ class OpenaiEngine(Engine):
         backoff.expo,
         (APIError, RateLimitError, APIConnectionError, ServiceUnavailableError, InvalidRequestError),
     )
+    def plain_generate(self, prompt: list = None, max_new_tokens=4096, temperature=None, model=None,
+                 **kwargs):
+        self.current_key_idx = (self.current_key_idx + 1) % len(self.api_keys)
+        start_time = time.time()
+        if (
+                self.request_interval > 0
+                and start_time < self.next_avil_time[self.current_key_idx]
+        ):
+            time.sleep(self.next_avil_time[self.current_key_idx] - start_time)
+        openai.api_key = self.api_keys[self.current_key_idx]
+        prompt_input = [
+            {"role": "system", "content": [{"type": "text", "text": prompt[0]}]},
+        ]
+        for curr in prompt[1:]:
+            prompt_input.extend([
+                {"role": "user",
+                 "content": [{"type": "text", "text": curr}]},
+            ])
+            response = openai.ChatCompletion.create(
+                model=model if model else self.model,
+                messages=prompt_input,
+                max_tokens=max_new_tokens if max_new_tokens else 4096,
+                temperature=temperature if temperature else self.temperature,
+                **kwargs,
+            )
+            answer = [choice["message"]["content"] for choice in response["choices"]][0]
+            prompt_input.extend([{"role": "assistant", "content": [{"type": "text", "text": answer}]}]) 
+        return answer
+    @backoff.on_exception(
+        backoff.expo,
+        (APIError, RateLimitError, APIConnectionError, ServiceUnavailableError, InvalidRequestError),
+    )
     def generate(self, prompt: list = None, max_new_tokens=4096, temperature=None, model=None, image_path=None,
-                 ouput__0=None, turn_number=0, **kwargs):
+                 output__0=None, turn_number=0, **kwargs):
         self.current_key_idx = (self.current_key_idx + 1) % len(self.api_keys)
         start_time = time.time()
         if (
@@ -130,7 +162,7 @@ class OpenaiEngine(Engine):
                  "content": [{"type": "text", "text": prompt1}, {"type": "image_url", "image_url": {"url":
                                                                                                         f"data:image/jpeg;base64,{base64_image}",
                                                                                                     "detail": "high"}, }]},
-                {"role": "assistant", "content": [{"type": "text", "text": f"\n\n{ouput__0}"}]},
+                {"role": "assistant", "content": [{"type": "text", "text": f"\n\n{output__0}"}]},
                 {"role": "user", "content": [{"type": "text", "text": prompt2}]}, ]
             response2 = openai.ChatCompletion.create(
                 model=model if model else self.model,
@@ -140,6 +172,62 @@ class OpenaiEngine(Engine):
                 **kwargs,
             )
             return [choice["message"]["content"] for choice in response2["choices"]][0]
+        elif turn_number == 2:
+            base64_image = encode_image(image_path)
+            output__1 = kwargs["output__1"]
+            del kwargs["output__1"]
+            prompt3 = "Suppose the above option is not optimal, what's the second best option to choose? Follow the same format as the previous answer"
+            prompt3_input = [
+                {"role": "system", "content": [{"type": "text", "text": prompt0}]},
+                {"role": "user",
+                 "content": [{"type": "text", "text": prompt1}, {"type": "image_url", "image_url": {"url":
+                                                                                                        f"data:image/jpeg;base64,{base64_image}",
+                                                                                                    "detail": "high"}, }]},
+                {"role": "assistant", "content": [{"type": "text", "text": f"\n\n{output__0}"}]},
+                {"role": "user", "content": [{"type": "text", "text": prompt2}]},
+                {"role": "assistant", "content": [{"type": "text", "text": f"\n\n{output__1}"}]},
+                {"role": "user", "content": [{"type": "text", "text": prompt3}]},
+            ]
+               
+            response3 = openai.ChatCompletion.create(
+                model=model if model else self.model,
+                messages=prompt3_input,
+                max_tokens=max_new_tokens if max_new_tokens else 4096,
+                temperature=temperature if temperature else self.temperature,
+                **kwargs,
+            )
+            return [choice["message"]["content"] for choice in response3["choices"]][0]
+        elif turn_number == 3:
+            base64_image = encode_image(image_path)
+            output__1 = kwargs["output__1"]
+            output__2 = kwargs["output__2"]
+            del kwargs["output__1"]
+            del kwargs["output__2"]
+            prompt3 = "Suppose the above option is not optimal, what's the second best option to choose? Follow the same format as the previous answer"
+            prompt4 = "Suppose the above options are not optimal, what's the third best option to choose? Follow the same format as the previous answer"
+            prompt4_input = [
+                {"role": "system", "content": [{"type": "text", "text": prompt0}]},
+                {"role": "user",
+                 "content": [{"type": "text", "text": prompt1}, {"type": "image_url", "image_url": {"url":
+                                                                                                        f"data:image/jpeg;base64,{base64_image}",
+                                                                                                    "detail": "high"}, }]},
+                {"role": "assistant", "content": [{"type": "text", "text": f"\n\n{output__0}"}]},
+                {"role": "user", "content": [{"type": "text", "text": prompt2}]},
+                {"role": "assistant", "content": [{"type": "text", "text": f"\n\n{output__1}"}]},
+                {"role": "user", "content": [{"type": "text", "text": prompt3}]},
+                {"role": "assistant", "content": [{"type": "text", "text": f"\n\n{output__2}"}]},
+                {"role": "user", "content": [{"type": "text", "text": prompt4}]},
+            ]
+               
+            response4 = openai.ChatCompletion.create(
+                model=model if model else self.model,
+                messages=prompt4_input,
+                max_tokens=max_new_tokens if max_new_tokens else 4096,
+                temperature=temperature if temperature else self.temperature,
+                **kwargs,
+            )
+            return [choice["message"]["content"] for choice in response4["choices"]][0]
+
 
 
 class OpenaiEngine_MindAct(Engine):

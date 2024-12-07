@@ -1,12 +1,13 @@
 [basic]
 is_demo = true # Set to true for demo mode, prompting user input for tasks and URLs. False reads tasks from a JSON file.
 save_file_dir = "../online_results" # Directory to save the results of the program's operations.
-default_task ="Figure out the task to be done in the first page instruction and then do the task accordingly. Please note that the color and the size of a clothes can be selected and that might not match with the picture in the search page." # Default task to perform.
-default_website = "http://127.0.0.1:3000/ac" # Default website to start the task.
+default_task ="Figure out the task to be done in the first page instruction and then do the task accordingly. Please note that certain options can be chosen inside the product page such as color or size which means the image in the search page is only one example of the product. Also, there might not be a perfect match, in which case you should try to find the closest match as possible. The searched result is ranked from the most relevant to the least relevant so usually next page will give less relevant products. If there is no result in the next page, consider to go back to search and try different queries. Also, you only have ten actions each time, so please use them wisely. If you end up buy nothing after ten rounds, then you will receive zero score. It is better to at least select something that matches imperfectly." # Default task to perform.
+default_website = "http://127.0.0.1:3000/fixed_1" # Default website to start the task.
+
 [experiment]
 task_file_path = "../data/online_tasks/sample_tasks.json" # Path to the JSON file with tasks (ignored if is_demo is true).
 overwrite = false # Enable to overwrite existing results. Disable to skip tasks already saved in save_file_dir.
-top_k = 50  # Number of top element candidates to consider if a ranker is used.
+top_k = 5  # Number of top element candidates to consider if a ranker is used.
 fixed_choice_batch_size = 17 # Fixed number of options for each multiple-choice question.
 # Ensure a manageable number to prevent Playwright crashes during screenshot capture due to large image sizes.
 dynamic_choice_batch_size=0 # Dynamic batch size based on webpage height. Overrides fixed_choice_batch_size if positive.
@@ -18,13 +19,16 @@ dev_mode=false # Developer mode toggle.
 # storage_state="" # Path to a saved cookie file, if any.
 # ranker_path = "../model/deberta-v3-base" # Path to the ranking model. Comment out to disable ranking and treat all elements as candidates.
 # Pretrained model: https://huggingface.co/osunlp/MindAct_CandidateGeneration_deberta-v3-base
+
 [openai]
 # You can find your API key at https://platform.openai.com/account/api-keys.
 rate_limit = -1 # Rate limit for API calls (-1 for no limit).
 model = "gpt-4o" # Model name, indicating the use of GPT-4 with vision capabilities.
 temperature = 0 # Temperature setting for GPT's responses, controlling randomness.
+
 [oss_model]
 # Reserved for future updates on open-source models.
+
 [playwright]
 save_video = false # Toggle to save Playwright recordings. Can be slow during saving, mainly for experimental use.
 tracing = false # Toggle to save Playwright trace files. This will significantly slow down the script. Not recommended for general users.

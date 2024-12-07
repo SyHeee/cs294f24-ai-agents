@@ -23,7 +23,43 @@ action_format = "ACTION: Choose an action from {CLICK, TYPE, SELECT}."
 value_format = "VALUE: Provide additional input based on ACTION.\n\nThe VALUE means:\nIf ACTION == TYPE, specify the " \
                "text to be typed.\nIf ACTION == SELECT, specify the option to be chosen.\nIf ACTION == CLICK, " \
                "write \"None\"."
+reflection_dict = {
+    "referring_description": f"""(Reiteration)
+First, reiterate the chosen action that you wish to reconsider.
 
+(Multichoice Question)
+Below is a multi-choice question, where the choices are your previous actions. Please examine the choices one by one. Choose THREE matching action that you want to reconsider. There should be more than three actions for you to choose. Choose most promising actions to reconsider based on by re-examining the choies and your further reasoning.""",
+
+    "element_format": """(Final Answer)
+Finally, conclude your answer using the format below. Ensure your answer is strictly adhering to the format provided below. Please do not leave any explanation in your answers of the final standardized format part, and this final part should be clear and certain. The element choice should be in a separate line.
+
+Format:
+
+ELEMENT: The uppercase letter of your first choice.
+
+REASON: A short description of your reasoning for the first choice and alternative plans.
+
+ELEMENT: The uppercase letter of your second choice.
+
+REASON: A short description of your reasoning for second choice and alternative plans.
+
+ELEMENT: The uppercase letter of your third choice.
+
+REASON: A short description of your reasoning for third choice and alternative plans.
+""",
+    'question_description': '''Previous actions show your attempts to solve the task. Follow the following guidance to think step by step before figuring out which previous action has potential to improve.  
+
+(Previous Action Analysis)
+Firstly, analyze each step of the previous action history and their intention one by one. Particularly, think about whether they are appropriate or not in retrospect in terms of whether they help achieve your goal.
+
+(Alternative Plan)
+Then, based on your analysis, in conjunction with human web browsing habits and the nature of the given task, decide on which three previous action has should be revisited if you can change one of those actions. Please note that revisit certain actions will be essentially the same, such as searching different queries. In that case, please make sure you only include the earliest type action and choose some more different actions to cover a wider range of possibilities.
+
+To be successful, it is important to follow the following rules:
+1. You should only choose three previous action that has the highest probability of improving the outcome.
+2. You should only choose from the previous taken actions listed above.
+'''
+}
 question_description_new_exp4 = '''The screenshot below shows the webpage you see. Follow the following guidance to think step by step before outlining the next action step at the current stage:
 
 (Current Webpage Identification)
@@ -299,4 +335,27 @@ def generate_prompt(experiment_split, task=None, previous=None, choices=None):
                                           action_format=action_format_input, value_format=value_format_input,
                                           choices=choices))
         return prompt_list
+
+def generate_reflection_summary(previous_action, reason):
+    return f"In your previous trial, you chose to take the action: {previous_action} either for this round or previous rounds. However, this action turns out to be suboptimal based on the post-analysis, {reason}. Please CONSIDER THIS WHEN YOU MAKE FURTHER DECISIONS!"
+
+def generate_reflection_prompt(task=None, previous=None,):
+    assert task != None, "Please input the task."
+    assert previous != None, "Please input the previous actions."
+
+    prompt_list = []
+
+    system_prompt_input = seeact_choice_prompt_dict["system_prompt"]
+    question_description = reflection_dict["question_description"]
+    element_format = reflection_dict["element_format"]
+    referring_input = reflection_dict["referring_description"]
+    prompt_list = []
+
+    prompt_list.extend(
+        generate_new_query_prompt(system_prompt=system_prompt_input, task=task, previous_actions=previous,
+                                  question_description=question_description))
+    prompt_list.append(
+        generate_new_referring_prompt(referring_description=referring_input, element_format=element_format,
+                                      choices=[[0, x] for x in previous]))
+    return prompt_list
 
