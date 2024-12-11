@@ -1,5 +1,7 @@
 # Web Agent with Monte Carlo Tree Search
 
+The code is dependent on openai==0.28.0
+
 ## How to run the base code
 ```python
 python seeact.py -c config/webshop_mode.toml
