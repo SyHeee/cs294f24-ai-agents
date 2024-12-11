@@ -281,7 +281,7 @@ async def main(config, base_dir) -> None:
             await asyncio.sleep(2)
             try_again = False
 
-            for trial in range(1):
+            for trial in range(3):
                 if try_again:
                     complete_flag = False
                     monitor_signal = ""
@@ -355,7 +355,7 @@ async def main(config, base_dir) -> None:
                                       "num_step": len(taken_actions), "action_history": taken_actions,
                                       "exit_by": "No elements"}
         
-                        with open(os.path.join(main_result_path, 'result.json'), 'w', encoding='utf-8') as file:
+                        with open(os.path.join(main_result_path, f'result_{trial}.json'), 'w', encoding='utf-8') as file:
                             json.dump(final_json, file, indent=4)
                         # logger.shutdown()
                         #
@@ -842,7 +842,7 @@ async def main(config, base_dir) -> None:
                         success_or_not = ""
                         if valid_op_count == 0:
                             success_or_not = "0"
-                        logger.info(f"Write results to json file: {os.path.join(main_result_path, 'result.json')}")
+                        logger.info(f"Write results to json file: {os.path.join(main_result_path, f'result_{trial}.json')}")
                         final_json = {"confirmed_task": confirmed_task, "website": confirmed_website,
                                       "task_id": task_id, "success_or_not": success_or_not,
                                       "num_step": len(taken_actions), "action_history": taken_actions, "exit_by": str(e)}

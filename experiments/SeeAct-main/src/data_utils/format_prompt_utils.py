@@ -127,7 +127,7 @@ def generate_new_query_prompt(system_prompt="", task="", previous_actions=None, 
     if previous_actions is None:
         previous_actions = []
     for action_text in previous_actions:
-        previous_action_text += action_text
+        previous_action_text += action_text if action_text is not None else ""
         previous_action_text += "\n"
     query_text += previous_action_text
     query_text += "\n"
@@ -244,5 +244,4 @@ def get_index_from_option_name(name):
         return 26 + first_letter_index * 26 + second_letter_index
     else:
         raise Exception("The string should be either 1 or 2 characters long")
-
 
