@@ -1,3 +1,5 @@
+export OPENAI_API_KEY=sk-proj-8PcGgZqkhEJeW62qrHz0T3BlbkFJdgCgMebKWG8pU3TM2O24
+
 python run.py \
     --backend gpt-4 \
     --task_start_index 0 \
