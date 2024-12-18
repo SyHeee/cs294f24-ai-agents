@@ -28,6 +28,13 @@ import warnings
 from dataclasses import dataclass
 import numpy as np
 
+from dotenv import load_dotenv
+
+load_dotenv()
+# Setup your API Key here, or pass through environment
+# openai_api_key = os.getenv("OPENAI_API_KEY")
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+
 import toml
 import torch
 from aioconsole import ainput, aprint

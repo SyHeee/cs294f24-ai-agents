@@ -5,8 +5,8 @@ from os.path import join as oj
 import pandas as pd
 
 
-dir_paths = ["../2024_12_7_first_results", "../2024_12_7_new_prompt", "../2024_12_8_first_click", "../2024_12_8_seeact_3"]
-
+#dir_paths = ["../2024_12_7_first_results", "../2024_12_7_new_prompt", "../2024_12_8_first_click", "../2024_12_8_seeact_3"]
+dir_paths = ["../2024_12_7_results"]
 for dir_path in dir_paths:
     out = []
     i = 0
