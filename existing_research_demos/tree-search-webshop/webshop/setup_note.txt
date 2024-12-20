@@ -1,6 +1,0 @@
-conda env remove --name webshop
-conda create -n webshop python=3.8.13
-conda activate webshop
-# user setup_arm.sh 
-conda install spacy
-pip install -r requirements_arm.txt
