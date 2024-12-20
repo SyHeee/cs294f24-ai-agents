@@ -10,11 +10,11 @@ In this project, we propose to integrate Monte Carlo Tree Search (MCTS) techniqu
 We design two prompts, one of which enforce stricter decision-making instruction, while the other one encourage more exploration and harness the advantageous exploitation-exploration trade-off of MCTS. Experiments on the WebShop benchmark demonstrate that combining flexible prompts with MCTS significantly improves agent performance among all the configurations tested.
 
 ## 🔗 Demo
-[![Check out the demo of our proposed algorithm on Youtube](https://drive.google.com/file/d/1X7JQPBrN0Kg6p9-FyZ5CTzfZg5OYZi6x/view?usp=share_link)](https://youtu.be/a0-t8fPYWIQ)
+[![Check out the demo of our proposed algorithm on Youtube](https://img.youtube.com/vi/a0-t8fPYWIQ/default.jpg)](https://youtu.be/a0-t8fPYWIQ)
 
 ## 🧰 Experiments
 ### 1. Prerequisites Installation
-We use the GPT-4o model as LLM and integrate MCTS to the [SeeAct](https://osu-nlp-group.github.io/SeeAct/) framework and run experiments on the [WebShop](https://webshop-pnlp.github.io) dataset.
+We use the GPT-4o model as LLM and integrate MCTS to the [SeeAct](https://osu-nlp-group.github.io/SeeAct/) framework. We run experiments on the [WebShop](https://webshop-pnlp.github.io) dataset.
 
 #### 1.1 SeeAct Installation
 ```bash
@@ -28,7 +28,7 @@ pip uninstall openai # we will use older version commits hence need a compatible
 pip install openai==0.28.0
 
 # set up PlayWright and install the browser kernels
-playwright install
+playwright install chromium
 ```
 
 #### 1.2 WebShop Installation
@@ -72,7 +72,7 @@ for n in {0..20}; do python seeact.py -c config/webshop_mode2.toml -n $n; done;
 for n in {0..20}; do python seeact_3.py -c config/webshop_mode2.toml -n $n; done;
 ```
 
-#### 2.3 Calculate score
+#### 2.3 Calculate scores
 ```bash
 # You shoulf modify the folder names in agg_score.py before running
 python agg_score.py
@@ -80,6 +80,8 @@ python agg_score.py
 
 ##
 👉 Primary contact of this project: Shiying He (sy.he0303@gmail.com)
+
 👉 MOOC course site: [http://llmagents-learning.org/f24](http://llmagents-learning.org/f24).
+
 👉 Hackathon website: [https://rdi.berkeley.edu/llm-agents-hackathon/](https://rdi.berkeley.edu/llm-agents-hackathon/).
 
