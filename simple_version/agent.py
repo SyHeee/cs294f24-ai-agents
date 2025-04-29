@@ -12,7 +12,11 @@ import json
 
 from prompts import _initialize_prompt
 from utils import setup_logging, get_log_dir
-from parse_web_action import execute_action
+from parse_web_action import _execute_action
+import pdb
+
+log_dir, screenshot_dir = get_log_dir()
+logger = setup_logging(log_dir, 'Main')
 
 class Agent:
     def __init__(self, 
@@ -37,6 +41,7 @@ class Agent:
         """
         Analyze user query using LLM to generate web action plan
         """
+        # TODO: refine the system prompt for better 1) plan setting 2) return format.
         system_prompt = """Analyze the user's query and determine the most appropriate web actions.
         Generate a specific plan including website to visit, search terms, and target elements."""
         
@@ -101,7 +106,7 @@ class Agent:
         """
         Execute a single browser action using Playwright and return observation
         """
-        observation = await execute_action(self.page, action)
+        observation = await _execute_action(self.page, action)
         await self.log_action(action["action"], observation)
         return observation
 
@@ -207,6 +212,7 @@ class Agent:
             await self.setup()
             # Analyze the task first
             action_plan = await self.analyze_task(initial_query)
+            import pdb; pdb.set_trace()
             grounded_actions = await self.ground_action(action_plan)
             # Execute initial actions
             for action in grounded_actions:
@@ -217,7 +223,7 @@ class Agent:
             if result["can_stop_search"]:
                 self.trajectory.append(result)
             else:
-                # Continue with dynamic action generation
+                # If not done with grounded actions, continue with dynamic action generation
                 for step in range(len(grounded_actions), max_steps):
                     self.logger.info(f"Starting step {step + 1} of {max_steps}")
                     prompt = self.generate_prompt()
@@ -229,6 +235,7 @@ class Agent:
                     
                     # Convert LLM response to action
                     try:
+                        # TODO: add more actions below based on refined action space
                         action = {
                             "action": "click" if next_action.lower().startswith("click") else "search",
                             "value": next_action.split(None, 1)[1].strip(),
@@ -238,7 +245,8 @@ class Agent:
                     except Exception as e:
                         self.logger.error(f"Error executing action: {e}")
                         break
-        
+                result = await self.is_done(initial_query)
+                self.trajectory.append(result)
         finally:
             await self.cleanup()
         
@@ -254,17 +262,17 @@ class Agent:
 
 async def main():
     agent = Agent(llm_type="gpt-4o-mini")
-    query = "What is the capital city of France?"
+    query = """Search a dinning table on google and click the first search result."""
+    # query = """What is the capital city of France?"""
     trajectory = await agent.run(query)
     
-    print("\nFinal Trajectory:")
+    logger.info("\nFinal Trajectory:")
     for step in trajectory[:-1]:
-        print(f"Step {step['step']}:")
-        print(f"Action: {step['action']}")
-        print(f"Observation: {step['observation']}")
-        print(f"Screenshot: {step['screenshot']}")
-        print()
-    print(trajectory[-1]["final_answer"])
+        logger.info(f"Step {step['step']}:")
+        logger.info(f"Action: {step['action']}")
+        logger.info(f"Observation: {step['observation']}")
+        logger.info(f"Screenshot: {step['screenshot']}\n")        
+    logger.info(trajectory[-1]["final_answer"])
     
 
 if __name__ == "__main__":
